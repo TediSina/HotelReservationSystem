@@ -293,6 +293,7 @@ class SherbimDialog(tk.Toplevel):
         self.transient(parent)
         self.grab_set()
         self.geometry("600x400")
+        self.minsize(600, 400)
         self.rezervim_id = rezervim_id
         self.m_sh = m_sh
 

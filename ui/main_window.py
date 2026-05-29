@@ -113,7 +113,7 @@ class MainWindow(tk.Tk):
         self.title(APP_TITLE)
         self.geometry("1280x800")
         self.configure(bg=COLORS["bg"])
-        self.minsize(1100, 650)
+        self.minsize(1280, 800)
 
         apply_styles(self)
 

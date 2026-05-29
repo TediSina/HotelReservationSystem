@@ -95,7 +95,8 @@ class DetajetFatures(tk.Toplevel):
         self.configure(bg=COLORS["bg"])
         self.transient(parent)
         self.grab_set()
-        self.geometry("550x500")
+        self.geometry("550x600")
+        self.minsize(550, 600)
 
         wrap = ttk.Frame(self, padding=25)
         wrap.pack(fill="both", expand=True)

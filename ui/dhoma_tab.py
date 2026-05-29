@@ -191,6 +191,7 @@ class LlojetDialog(tk.Toplevel):
         self.transient(parent)
         self.grab_set()
         self.geometry("700x500")
+        self.minsize(700, 500)
 
         frm = ttk.Frame(self, padding=15)
         frm.pack(fill="both", expand=True)
