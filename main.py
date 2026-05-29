@@ -8,12 +8,25 @@ Para se të nisni aplikacionin, sigurohuni që:
   2. Keni ekzekutuar skriptet SQL nga drejtoria database/
   3. Keni instaluar varësitë: pip install -r requirements.txt
 """
+import ctypes
 import sys
 from ui.main_window import MainWindow
 
 
+def _set_windows_app_id():
+    if sys.platform != "win32":
+        return
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+            "HotelAdriatik.ReservationSystem.1"
+        )
+    except Exception:
+        pass
+
+
 def main():
     try:
+        _set_windows_app_id()
         app = MainWindow()
         app.mainloop()
     except KeyboardInterrupt:

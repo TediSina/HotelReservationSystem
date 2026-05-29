@@ -36,6 +36,23 @@ def _load_logo(path: str, size: int):
         return None
 
 
+def _ensure_ico_from_png(png_path: str):
+    if not _PIL_OK or not os.path.exists(png_path):
+        return None
+
+    ico_path = os.path.splitext(png_path)[0] + ".ico"
+    try:
+        if os.path.exists(ico_path) and os.path.getmtime(ico_path) >= os.path.getmtime(png_path):
+            return ico_path
+
+        img = Image.open(png_path).convert("RGBA")
+        img.save(ico_path, format="ICO",
+                 sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+        return ico_path
+    except Exception:
+        return None
+
+
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -48,10 +65,17 @@ class MainWindow(tk.Tk):
 
         # Logot — versione të resampluara me Pillow (LANCZOS) për cilësi më të mirë.
         assets = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
+        logo_path = os.path.join(assets, "logo.png")
+        logo_ico_path = _ensure_ico_from_png(logo_path)
         # Logo për header (64 px target, kornizë 80 px e header-it)
-        self._logo_header = _load_logo(os.path.join(assets, "logo.png"), 64)
+        self._logo_header = _load_logo(logo_path, 64)
         # Ikon dritareje (64 px është standard për taskbar/dock)
-        self._logo_icon = _load_logo(os.path.join(assets, "logo.png"), 64)
+        self._logo_icon = _load_logo(logo_path, 64)
+        if logo_ico_path is not None:
+            try:
+                self.iconbitmap(default=logo_ico_path)
+            except Exception:
+                pass
         if self._logo_icon is not None:
             try:
                 self.iconphoto(True, self._logo_icon)

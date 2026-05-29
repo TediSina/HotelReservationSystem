@@ -116,6 +116,27 @@ class RezervimTab(ttk.Frame):
         if not rid:
             messagebox.showwarning("Pa zgjedhje", "Zgjidhni një rezervim.")
             return
+        try:
+            fatura = m_fatura.gjej_per_rezervim(rid)
+            if fatura:
+                r = m_rez.gjej(rid)
+                if r["status"] != 'I_PERFUNDUAR':
+                    m_rez.ndrysho_status(rid, 'I_PERFUNDUAR')
+                    self.refresh()
+                    self.on_change()
+                    messagebox.showinfo("Sukses",
+                        "Fatura ekziston tashme.\n"
+                        "Rezervimi u perfundua me sukses.\n"
+                        f"ID e Fatures: {fatura['fatura_id']}")
+                else:
+                    messagebox.showinfo("Info",
+                        "Fatura ekziston tashme dhe rezervimi eshte i perfunduar.\n"
+                        f"ID e Fatures: {fatura['fatura_id']}")
+                return
+        except Exception as e:
+            messagebox.showerror("Gabim", str(e))
+            return
+
         r = m_rez.gjej(rid)
         if r["status"] == 'I_PERFUNDUAR':
             messagebox.showinfo("Info", "Rezervimi është i përfunduar tashmë.")

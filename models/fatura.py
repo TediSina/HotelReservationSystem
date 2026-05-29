@@ -33,6 +33,12 @@ def gjej(fatura_id: int) -> dict | None:
         return cur.fetchone()
 
 
+def gjej_per_rezervim(rezervim_id: int) -> dict | None:
+    with Database.cursor() as cur:
+        cur.execute("SELECT * FROM Fatura WHERE rezervim_id = %s", (rezervim_id,))
+        return cur.fetchone()
+
+
 def gjenero_per_rezervim(rezervim_id: int, menyra_pagese: str = 'CASH') -> int:
     """Thërret proceduren e ruajtur sp_gjenero_fature dhe kthen fatura_id-në."""
     conn = Database.get_connection()
