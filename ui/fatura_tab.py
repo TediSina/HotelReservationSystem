@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from models import fatura as m_fatura
-from ui.styles import COLORS
+from ui.styles import COLORS, row_tags, style_treeview
 
 
 class FaturaTab(ttk.Frame):
@@ -32,10 +32,11 @@ class FaturaTab(ttk.Frame):
         ttk.Button(header, text="↻ Rifresko",
                    command=self.refresh).pack(side="right")
 
-        tree_frame = ttk.Frame(self)
+        tree_frame = ttk.Frame(self, style="Surface.TFrame")
         tree_frame.pack(fill="both", expand=True)
         self.tree = ttk.Treeview(tree_frame, columns=[c[0] for c in self.COLS],
                                   show="headings")
+        style_treeview(self.tree)
         for c, lbl, w in self.COLS:
             self.tree.heading(c, text=lbl)
             self.tree.column(c, width=w, anchor="w")
@@ -46,7 +47,7 @@ class FaturaTab(ttk.Frame):
         vsb.pack(side="right", fill="y")
         self.tree.bind("<Double-1>", lambda _e: self._shiko_detajet())
 
-        actions = ttk.Frame(self)
+        actions = ttk.Frame(self, style="Toolbar.TFrame")
         actions.pack(fill="x", pady=10)
         ttk.Button(actions, text="Shiko detajet",
                    command=self._shiko_detajet).pack(side="left", padx=(0, 8))
@@ -58,11 +59,12 @@ class FaturaTab(ttk.Frame):
     def refresh(self):
         for r in self.tree.get_children():
             self.tree.delete(r)
-        for f in m_fatura.listo():
+        for index, f in enumerate(m_fatura.listo()):
             self.tree.insert("", "end", values=(
                 f["fatura_id"], f["data_leshimit"], f["klienti"], f["nr_dhoma"],
                 f"{f['shuma_neto']:.2f} L", f"{f['tvsh']:.2f} L",
-                f"{f['shuma_totale']:.2f} L", f["menyra_pagese"], f["status_pagese"]))
+                f"{f['shuma_totale']:.2f} L", f["menyra_pagese"], f["status_pagese"]),
+                tags=row_tags(index, f["status_pagese"]))
 
     def _selected_id(self):
         sel = self.tree.selection()
@@ -98,7 +100,7 @@ class DetajetFatures(tk.Toplevel):
         self.geometry("550x600")
         self.minsize(550, 600)
 
-        wrap = ttk.Frame(self, padding=25)
+        wrap = ttk.Frame(self, padding=25, style="Dialog.TFrame")
         wrap.pack(fill="both", expand=True)
 
         ttk.Label(wrap, text="HOTEL ADRIATIK", style="Title.TLabel").pack()
@@ -113,7 +115,7 @@ class DetajetFatures(tk.Toplevel):
             r.pack(fill="x", pady=2)
             ttk.Label(r, text=lbl, width=22, anchor="w").pack(side="left")
             ttk.Label(r, text=str(val), anchor="w",
-                      font=("Helvetica", 10, "bold")).pack(side="left")
+                      font=("Segoe UI Semibold", 10)).pack(side="left")
 
         row("Data e lëshimit:", fatura["data_leshimit"])
         row("Klienti:", fatura["klienti"])

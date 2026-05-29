@@ -3,7 +3,7 @@ import tkinter as tk
 from datetime import date, timedelta
 from tkinter import ttk, messagebox
 from models import rezervim as m_rez, klient as m_klient, dhoma as m_dhoma, fatura as m_fatura
-from ui.styles import COLORS
+from ui.styles import COLORS, row_tags, style_treeview
 
 
 class RezervimTab(ttk.Frame):
@@ -33,11 +33,11 @@ class RezervimTab(ttk.Frame):
         ttk.Label(header, text="Krijoni dhe menaxhoni rezervimet e dhomave",
                   style="Subtitle.TLabel").pack(side="left", padx=15)
 
-        toolbar = ttk.Frame(self)
+        toolbar = ttk.Frame(self, style="Toolbar.TFrame")
         toolbar.pack(fill="x", pady=(0, 10))
         ttk.Button(toolbar, text="+ Rezervim i ri",
                    command=self.dialog_shto).pack(side="left", padx=(0, 12))
-        ttk.Label(toolbar, text="Filtro sipas statusit:").pack(side="left", padx=(0, 6))
+        ttk.Label(toolbar, text="Filtro sipas statusit:", style="Toolbar.TLabel").pack(side="left", padx=(0, 6))
         self.filter_v = tk.StringVar(value='TË GJITHA')
         cb = ttk.Combobox(toolbar, textvariable=self.filter_v, values=self.STATUSE,
                            state="readonly", width=18)
@@ -46,10 +46,11 @@ class RezervimTab(ttk.Frame):
         ttk.Button(toolbar, text="↻ Rifresko",
                    command=self.refresh).pack(side="right")
 
-        tree_frame = ttk.Frame(self)
+        tree_frame = ttk.Frame(self, style="Surface.TFrame")
         tree_frame.pack(fill="both", expand=True)
         self.tree = ttk.Treeview(tree_frame, columns=[c[0] for c in self.COLS],
                                   show="headings")
+        style_treeview(self.tree)
         for c, lbl, w in self.COLS:
             self.tree.heading(c, text=lbl)
             self.tree.column(c, width=w, anchor="w")
@@ -59,7 +60,7 @@ class RezervimTab(ttk.Frame):
         self.tree.pack(side="left", fill="both", expand=True)
         vsb.pack(side="right", fill="y")
 
-        actions = ttk.Frame(self)
+        actions = ttk.Frame(self, style="Toolbar.TFrame")
         actions.pack(fill="x", pady=10)
         ttk.Button(actions, text="Check-in (regjistro)", style="Success.TButton",
                    command=lambda: self._ndrysho_status('I_REGJISTRUAR')).pack(side="left", padx=(0, 6))
@@ -76,11 +77,12 @@ class RezervimTab(ttk.Frame):
     def refresh(self):
         for r in self.tree.get_children():
             self.tree.delete(r)
-        for r in m_rez.listo(self.filter_v.get()):
+        for index, r in enumerate(m_rez.listo(self.filter_v.get())):
             self.tree.insert("", "end", values=(
                 r["rezervim_id"], r["klienti"], r["nr_dhoma"], r["lloji"],
                 r["data_check_in"], r["data_check_out"], r["net"],
-                f"{r['shuma_dhomes']:.2f} L", r["status"]))
+                f"{r['shuma_dhomes']:.2f} L", r["status"]),
+                tags=row_tags(index, r["status"]))
 
     def _selected_id(self):
         sel = self.tree.selection()
@@ -186,7 +188,7 @@ class RezervimDialog(tk.Toplevel):
         self.on_save = on_save
         self.resizable(False, False)
 
-        frm = ttk.Frame(self, padding=20)
+        frm = ttk.Frame(self, padding=24, style="Dialog.TFrame")
         frm.pack()
 
         # Klienti
@@ -269,7 +271,7 @@ class PageseseDialog(tk.Toplevel):
         self.resizable(False, False)
         self.menyra = None
 
-        frm = ttk.Frame(self, padding=20)
+        frm = ttk.Frame(self, padding=24, style="Dialog.TFrame")
         frm.pack()
         ttk.Label(frm, text="Zgjidhni mënyrën e pagesës:",
                   style="Header.TLabel").pack(pady=(0, 10))
@@ -297,13 +299,18 @@ class SherbimDialog(tk.Toplevel):
         self.rezervim_id = rezervim_id
         self.m_sh = m_sh
 
-        frm = ttk.Frame(self, padding=15)
+        frm = ttk.Frame(self, padding=15, style="Dialog.TFrame")
         frm.pack(fill="both", expand=True)
         ttk.Label(frm, text="Shërbime ekstra", style="Title.TLabel").pack(anchor="w")
 
         # Shërbimet aktuale
         ttk.Label(frm, text="Të zgjedhura:", style="Header.TLabel").pack(anchor="w", pady=(10, 5))
-        self.lst = tk.Listbox(frm, height=6)
+        self.lst = tk.Listbox(frm, height=6, bd=0, highlightthickness=1,
+                              highlightbackground=COLORS["border"],
+                              bg=COLORS["surface"], fg=COLORS["text"],
+                              selectbackground=COLORS["secondary"],
+                              selectforeground=COLORS["white"],
+                              font=("Segoe UI", 10))
         self.lst.pack(fill="x")
 
         # Shto

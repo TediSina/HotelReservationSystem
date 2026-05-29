@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from models import klient as m_klient
-from ui.styles import COLORS
+from ui.styles import COLORS, row_tags, style_treeview
 
 
 class KlientTab(ttk.Frame):
@@ -30,9 +30,9 @@ class KlientTab(ttk.Frame):
                   style="Subtitle.TLabel").pack(side="left", padx=15)
 
         # Search bar
-        search = ttk.Frame(self)
+        search = ttk.Frame(self, style="Toolbar.TFrame")
         search.pack(fill="x", pady=(0, 10))
-        ttk.Label(search, text="Kërko:").pack(side="left", padx=(0, 8))
+        ttk.Label(search, text="Kërko:", style="Toolbar.TLabel").pack(side="left", padx=(0, 8))
         self.search_var = tk.StringVar()
         e = ttk.Entry(search, textvariable=self.search_var, width=30)
         e.pack(side="left")
@@ -41,10 +41,11 @@ class KlientTab(ttk.Frame):
                    command=self.dialog_shto).pack(side="right")
 
         # Tabela
-        tree_frame = ttk.Frame(self)
+        tree_frame = ttk.Frame(self, style="Surface.TFrame")
         tree_frame.pack(fill="both", expand=True)
         self.tree = ttk.Treeview(tree_frame, columns=[c[0] for c in self.COLS],
                                   show="headings", selectmode="browse")
+        style_treeview(self.tree)
         for col, lbl, w in self.COLS:
             self.tree.heading(col, text=lbl)
             self.tree.column(col, width=w, anchor="w")
@@ -55,7 +56,7 @@ class KlientTab(ttk.Frame):
         self.tree.bind("<Double-1>", lambda _e: self.dialog_perditeso())
 
         # Veprime
-        actions = ttk.Frame(self)
+        actions = ttk.Frame(self, style="Toolbar.TFrame")
         actions.pack(fill="x", pady=10)
         ttk.Button(actions, text="Përditëso", style="Secondary.TButton",
                    command=self.dialog_perditeso).pack(side="left", padx=(0, 8))
@@ -67,8 +68,10 @@ class KlientTab(ttk.Frame):
     def refresh(self):
         for r in self.tree.get_children():
             self.tree.delete(r)
-        for k in m_klient.listo(self.search_var.get().strip()):
-            self.tree.insert("", "end", values=tuple(k.get(c[0], "") or "" for c in self.COLS))
+        for index, k in enumerate(m_klient.listo(self.search_var.get().strip())):
+            self.tree.insert("", "end",
+                             values=tuple(k.get(c[0], "") or "" for c in self.COLS),
+                             tags=row_tags(index))
 
     def _selected_id(self):
         sel = self.tree.selection()
@@ -132,7 +135,7 @@ class KlientDialog(tk.Toplevel):
         self.transient(parent)
         self.grab_set()
 
-        frm = ttk.Frame(self, padding=20)
+        frm = ttk.Frame(self, padding=24, style="Dialog.TFrame")
         frm.pack()
 
         self.vars = {k: tk.StringVar(value=(initial or {}).get(k, "") or "")

@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from models import dhoma as m_dhoma, lloji_dhomes as m_lloji
-from ui.styles import COLORS
+from ui.styles import COLORS, row_tags, style_treeview
 
 
 class DhomaTab(ttk.Frame):
@@ -28,7 +28,7 @@ class DhomaTab(ttk.Frame):
         ttk.Label(header, text="Inventari i dhomave dhe llojeve",
                   style="Subtitle.TLabel").pack(side="left", padx=15)
 
-        toolbar = ttk.Frame(self)
+        toolbar = ttk.Frame(self, style="Toolbar.TFrame")
         toolbar.pack(fill="x", pady=(0, 10))
         ttk.Button(toolbar, text="+ Shto dhomë",
                    command=self.dialog_shto_dhome).pack(side="left", padx=(0, 8))
@@ -37,10 +37,11 @@ class DhomaTab(ttk.Frame):
         ttk.Button(toolbar, text="↻ Rifresko",
                    command=self.refresh).pack(side="right")
 
-        tree_frame = ttk.Frame(self)
+        tree_frame = ttk.Frame(self, style="Surface.TFrame")
         tree_frame.pack(fill="both", expand=True)
         self.tree = ttk.Treeview(tree_frame, columns=[c[0] for c in self.COLS],
                                   show="headings")
+        style_treeview(self.tree)
         for col, lbl, w in self.COLS:
             self.tree.heading(col, text=lbl)
             self.tree.column(col, width=w, anchor="w")
@@ -51,7 +52,7 @@ class DhomaTab(ttk.Frame):
         vsb.pack(side="right", fill="y")
         self.tree.bind("<Double-1>", lambda _e: self.dialog_perditeso())
 
-        actions = ttk.Frame(self)
+        actions = ttk.Frame(self, style="Toolbar.TFrame")
         actions.pack(fill="x", pady=10)
         ttk.Button(actions, text="Përditëso", style="Secondary.TButton",
                    command=self.dialog_perditeso).pack(side="left", padx=(0, 8))
@@ -61,12 +62,12 @@ class DhomaTab(ttk.Frame):
     def refresh(self):
         for r in self.tree.get_children():
             self.tree.delete(r)
-        for d in m_dhoma.listo():
+        for index, d in enumerate(m_dhoma.listo()):
             row = (
                 d["dhoma_id"], d["numri"], d["kati"], d["lloji"],
                 d["kapaciteti"], f"{d['cmim_baza']:.2f} L", d["status"],
             )
-            self.tree.insert("", "end", values=row)
+            self.tree.insert("", "end", values=row, tags=row_tags(index, d["status"]))
 
     def _selected_id(self):
         sel = self.tree.selection()
@@ -129,7 +130,7 @@ class DhomaDialog(tk.Toplevel):
         self.grab_set()
         self.resizable(False, False)
 
-        frm = ttk.Frame(self, padding=20)
+        frm = ttk.Frame(self, padding=24, style="Dialog.TFrame")
         frm.pack()
 
         self.numri_v = tk.StringVar(value=(initial or {}).get("numri", ""))
@@ -190,10 +191,10 @@ class LlojetDialog(tk.Toplevel):
         self.configure(bg=COLORS["bg"])
         self.transient(parent)
         self.grab_set()
-        self.geometry("700x500")
-        self.minsize(700, 500)
+        self.geometry("700x600")
+        self.minsize(700, 600)
 
-        frm = ttk.Frame(self, padding=15)
+        frm = ttk.Frame(self, padding=18, style="Dialog.TFrame")
         frm.pack(fill="both", expand=True)
 
         ttk.Label(frm, text="Llojet e dhomave", style="Title.TLabel").pack(anchor="w")
@@ -202,10 +203,11 @@ class LlojetDialog(tk.Toplevel):
                 ("kapaciteti", "Kap.", 60),
                 ("cmim_baza", "Çmim baza", 120),
                 ("pershkrim", "Përshkrim", 280)]
-        tree_frame = ttk.Frame(frm)
+        tree_frame = ttk.Frame(frm, style="Surface.TFrame")
         tree_frame.pack(fill="both", expand=True, pady=10)
         self.tree = ttk.Treeview(tree_frame, columns=[c[0] for c in cols],
                                   show="headings")
+        style_treeview(self.tree)
         for c, lbl, w in cols:
             self.tree.heading(c, text=lbl)
             self.tree.column(c, width=w, anchor="w")
@@ -215,7 +217,7 @@ class LlojetDialog(tk.Toplevel):
         self.tree.pack(side="left", fill="both", expand=True)
         vsb.pack(side="right", fill="y")
 
-        actions = ttk.Frame(frm)
+        actions = ttk.Frame(frm, style="Toolbar.TFrame")
         actions.pack(fill="x", pady=(5, 0))
         ttk.Button(actions, text="+ Shto lloj",
                    command=self._shto).pack(side="left", padx=(0, 8))
@@ -228,10 +230,11 @@ class LlojetDialog(tk.Toplevel):
     def _refresh(self):
         for r in self.tree.get_children():
             self.tree.delete(r)
-        for l in m_lloji.listo():
+        for index, l in enumerate(m_lloji.listo()):
             self.tree.insert("", "end", values=(
                 l["lloji_id"], l["emertimi"], l["kapaciteti"],
-                f"{l['cmim_baza']:.2f} L", l["pershkrim"] or ""))
+                f"{l['cmim_baza']:.2f} L", l["pershkrim"] or ""),
+                tags=row_tags(index))
 
     def _shto(self):
         d = LlojiDialog(self)
@@ -261,7 +264,7 @@ class LlojiDialog(tk.Toplevel):
         self.grab_set()
         self.resizable(False, False)
 
-        frm = ttk.Frame(self, padding=20)
+        frm = ttk.Frame(self, padding=24, style="Dialog.TFrame")
         frm.pack()
 
         self.emertimi   = tk.StringVar()

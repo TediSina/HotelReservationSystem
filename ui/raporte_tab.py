@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from models import fatura as m_fatura
-from ui.styles import COLORS
+from ui.styles import COLORS, row_tags, style_treeview
 
 
 class RaporteTab(ttk.Frame):
@@ -30,6 +30,7 @@ class RaporteTab(ttk.Frame):
                  ("shuma_totale", "Total i përgjithshëm", 200)]
         self.tree1 = ttk.Treeview(lf1, columns=[c[0] for c in cols1],
                                    show="headings", height=6)
+        style_treeview(self.tree1)
         for c, lbl, w in cols1:
             self.tree1.heading(c, text=lbl)
             self.tree1.column(c, width=w, anchor="w")
@@ -44,6 +45,7 @@ class RaporteTab(ttk.Frame):
                  ("net_total", "Netë gjithsej", 150)]
         self.tree2 = ttk.Treeview(lf2, columns=[c[0] for c in cols2],
                                    show="headings", height=8)
+        style_treeview(self.tree2)
         for c, lbl, w in cols2:
             self.tree2.heading(c, text=lbl)
             self.tree2.column(c, width=w, anchor="w")
@@ -52,16 +54,18 @@ class RaporteTab(ttk.Frame):
     def refresh(self):
         for r in self.tree1.get_children():
             self.tree1.delete(r)
-        for row in m_fatura.te_ardhurat_mujore():
+        for index, row in enumerate(m_fatura.te_ardhurat_mujore()):
             self.tree1.insert("", "end", values=(
                 row["muaji"], row["nr_fatura"],
                 f"{row['neto_total']:.2f} L",
                 f"{row['tvsh_total']:.2f} L",
-                f"{row['shuma_totale']:.2f} L"))
+                f"{row['shuma_totale']:.2f} L"),
+                tags=row_tags(index))
 
         for r in self.tree2.get_children():
             self.tree2.delete(r)
-        for row in m_fatura.shfrytezimi_dhomave():
+        for index, row in enumerate(m_fatura.shfrytezimi_dhomave()):
             self.tree2.insert("", "end", values=(
                 row["numri"], row["lloji"],
-                row["nr_rezervimesh"], row["net_total"]))
+                row["nr_rezervimesh"], row["net_total"]),
+                tags=row_tags(index))

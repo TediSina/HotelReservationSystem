@@ -162,31 +162,44 @@ class MainWindow(tk.Tk):
         self._build_statusbar(msg)
 
     def _build_header(self):
-        bar = tk.Frame(self, bg=COLORS["primary"], height=80)
+        strip = tk.Frame(self, bg=COLORS["gold"], height=4)
+        strip.pack(fill="x", side="top")
+        strip.pack_propagate(False)
+
+        bar = tk.Frame(self, bg=COLORS["primary"], height=92)
         bar.pack(fill="x", side="top")
         bar.pack_propagate(False)
 
+        tk.Frame(bar, bg=COLORS["teal"], width=8).pack(side="left", fill="y")
+
         # Logo në header me cilësi të lartë (LANCZOS resampling përmes Pillow)
         if self._logo_header is not None:
-            lbl = tk.Label(bar, image=self._logo_header,
-                           bg=COLORS["primary"], bd=0)
-            lbl.pack(side="left", padx=15, pady=8)
+            logo_box = tk.Frame(bar, bg=COLORS["surface"], width=72, height=72)
+            logo_box.pack(side="left", padx=(18, 14), pady=10)
+            logo_box.pack_propagate(False)
+            lbl = tk.Label(logo_box, image=self._logo_header,
+                           bg=COLORS["surface"], bd=0)
+            lbl.pack(expand=True)
 
         ttl = tk.Frame(bar, bg=COLORS["primary"])
-        ttl.pack(side="left", padx=10)
+        ttl.pack(side="left", padx=4)
         tk.Label(ttl, text="HOTEL ADRIATIK",
-                 font=("Helvetica", 18, "bold"),
+                 font=("Bahnschrift SemiBold", 22),
                  fg=COLORS["white"], bg=COLORS["primary"]).pack(anchor="w")
         tk.Label(ttl, text="Sistemi i Menaxhimit të Rezervimeve",
-                 font=("Helvetica", 11),
-                 fg="#C7D6EA", bg=COLORS["primary"]).pack(anchor="w")
+                 font=("Segoe UI", 10),
+                 fg="#B7D4DC", bg=COLORS["primary"]).pack(anchor="w", pady=(2, 0))
 
-        tk.Label(bar, text=f"v{APP_VERSION}", font=("Helvetica", 9),
-                 fg="#C7D6EA", bg=COLORS["primary"]).pack(side="right", padx=20)
+        meta = tk.Frame(bar, bg=COLORS["primary_light"])
+        meta.pack(side="right", padx=18, pady=18)
+        tk.Label(meta, text=f"v{APP_VERSION}", font=("Segoe UI Semibold", 9),
+                 fg=COLORS["white"], bg=COLORS["primary_light"]).pack(padx=16, pady=(7, 1))
+        tk.Label(meta, text="Recepsioni", font=("Segoe UI", 9),
+                 fg="#B7D4DC", bg=COLORS["primary_light"]).pack(padx=16, pady=(1, 7))
 
     def _build_tabs(self):
         nb = ttk.Notebook(self)
-        nb.pack(fill="both", expand=True, padx=10, pady=10)
+        nb.pack(fill="both", expand=True, padx=18, pady=(16, 18))
 
         self.tab_klient   = KlientTab(nb)
         self.tab_dhoma    = DhomaTab(nb)
@@ -201,14 +214,15 @@ class MainWindow(tk.Tk):
         nb.add(self.tab_raporte,  text="  Raportet  ")
 
     def _build_statusbar(self, msg):
-        sb = tk.Frame(self, bg=COLORS["accent"], height=24)
+        sb = tk.Frame(self, bg=COLORS["surface"], height=28)
         sb.pack(side="bottom", fill="x")
         sb.pack_propagate(False)
-        tk.Label(sb, text=f"● E lidhur me {msg}", font=("Helvetica", 9),
-                 fg=COLORS["success"], bg=COLORS["accent"]).pack(side="left", padx=12)
+        tk.Frame(sb, bg=COLORS["border"], height=1).pack(side="top", fill="x")
+        tk.Label(sb, text=f"● E lidhur me {msg}", font=("Segoe UI Semibold", 9),
+                 fg=COLORS["success"], bg=COLORS["surface"]).pack(side="left", padx=16)
         tk.Label(sb, text="© 2026 Grupi: Eros Habazaj • Alons Fejzo • Tedi Sina • Tea Sina • Riseld Logu",
-                 font=("Helvetica", 9), fg=COLORS["muted"],
-                 bg=COLORS["accent"]).pack(side="right", padx=12)
+                 font=("Segoe UI", 9), fg=COLORS["muted"],
+                 bg=COLORS["surface"]).pack(side="right", padx=16)
 
     def _refresh_all(self):
         self.tab_dhoma.refresh()
