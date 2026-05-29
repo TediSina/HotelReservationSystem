@@ -18,7 +18,7 @@ def _set_windows_app_id():
         return
     try:
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
-            "HotelAdriatik.ReservationSystem.1"
+            "HotelAdriatik.ReservationSystem.2"
         )
     except Exception:
         pass
