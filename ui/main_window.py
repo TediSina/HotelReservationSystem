@@ -120,7 +120,7 @@ class MainWindow(tk.Tk):
         sb.pack_propagate(False)
         tk.Label(sb, text=f"● E lidhur me {msg}", font=("Helvetica", 9),
                  fg=COLORS["success"], bg=COLORS["accent"]).pack(side="left", padx=12)
-        tk.Label(sb, text="© 2026 Grupi: Habazaj • Fejzo • Sina • Sina • Logu",
+        tk.Label(sb, text="© 2026 Grupi: Eros Habazaj • Alons Fejzo • Tedi Sina • Tea Sina • Riseld Logu",
                  font=("Helvetica", 9), fg=COLORS["muted"],
                  bg=COLORS["accent"]).pack(side="right", padx=12)
 
