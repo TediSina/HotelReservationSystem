@@ -115,6 +115,8 @@ Skema është e **normalizuar deri në BCNF**. Hapat e ndërmjetëm (UNF → 1NF
 | Tea Sina           | Pyetjet SQL & raportet                       |
 | Riseld Logu        | Testim, dokumentim, prezantim                |
 
+---
+
 ## Licensa
 
 MIT License
